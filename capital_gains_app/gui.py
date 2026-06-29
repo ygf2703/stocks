@@ -119,7 +119,7 @@ class CapitalGainsApp(BaseWindow):
         ctk.set_default_color_theme("dark-blue")
         self.background = GraniteBackground(self)
         self.background.place(x=0, y=0, relwidth=1, relheight=1)
-        self.background.lower()
+        self.background.tk.call("lower", self.background._w)
 
         self.files: list[Path] = []
         self.last_result: CalculationResult | None = None
