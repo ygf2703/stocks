@@ -15,6 +15,7 @@ from .exporter import export_result
 from .fifo import calculate_fifo
 from .models import CalculationResult, ExchangeRateSnapshot, Transaction, ValidationIssue
 from .parsers import parse_workbooks
+from .ui_text import ASSISTANT_FONT_FAMILY, load_assistant_font, ui_font, ui_text, ui_title
 
 try:
     from tkinterdnd2 import DND_FILES, TkinterDnD
@@ -52,7 +53,6 @@ PALETTE = {
     "negative": "#FF8FB8",
     "positive": "#8FD8FF",
 }
-RTL_MARK = "\u200f"
 CHART_COLORS = [PALETTE["chart_white"], PALETTE["chart_blue"], PALETTE["chart_pink"], PALETTE["chart_yellow"]]
 
 
@@ -111,7 +111,8 @@ class GraniteBackground(tk.Canvas):
 class CapitalGainsApp(BaseWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.title("ניתוח רווחי הון FIFO")
+        load_assistant_font()
+        self.title(ui_title("ניתוח רווחי הון FIFO"))
         self.geometry("1180x760")
         self.minsize(1020, 680)
         self.configure(fg_color=PALETTE["bg"])
@@ -139,15 +140,15 @@ class CapitalGainsApp(BaseWindow):
         header.grid_columnconfigure(0, weight=1)
         ctk.CTkLabel(
             header,
-            text="היי ליאת, יש קבצים לניתוח?",
-            font=ctk.CTkFont(size=28, weight="bold"),
+            text=ui_text("היי ליאת, יש קבצים לניתוח?"),
+            font=ui_font(28, "bold"),
             text_color=PALETTE["text"],
             anchor="e",
         ).grid(row=0, column=0, padx=28, pady=(20, 4), sticky="ew")
         ctk.CTkLabel(
             header,
-            text="מחשבון FIFO מקומי לדוחות אגיס ולאומי, עם דשבורד וייצוא Excel",
-            font=ctk.CTkFont(size=15),
+            text=ui_text("מחשבון FIFO מקומי לדוחות אגיס ולאומי, עם דשבורד וייצוא Excel"),
+            font=ui_font(15),
             text_color=PALETTE["muted"],
             anchor="e",
         ).grid(row=1, column=0, padx=28, pady=(0, 18), sticky="ew")
@@ -162,7 +163,13 @@ class CapitalGainsApp(BaseWindow):
 
         exchange_box = ctk.CTkFrame(toolbar, corner_radius=8, fg_color=PALETTE["mist"])
         exchange_box.grid(row=0, column=4, padx=12, pady=10, sticky="e")
-        ctk.CTkLabel(exchange_box, text="תאריך מבוקש", text_color=PALETTE["muted"], anchor="e").grid(
+        ctk.CTkLabel(
+            exchange_box,
+            text=ui_text("תאריך מבוקש"),
+            font=ui_font(13),
+            text_color=PALETTE["muted"],
+            anchor="e",
+        ).grid(
             row=0, column=0, padx=(12, 6), pady=8
         )
         self.exchange_date_entry = ctk.CTkEntry(
@@ -173,6 +180,7 @@ class CapitalGainsApp(BaseWindow):
             border_color=PALETTE["line"],
             text_color=PALETTE["text"],
             justify="right",
+            font=ui_font(13),
         )
         self.exchange_date_entry.grid(row=0, column=1, padx=6, pady=8)
         self._button(exchange_box, "שער דולר", self.fetch_exchange_rate, width=92).grid(
@@ -191,7 +199,14 @@ class CapitalGainsApp(BaseWindow):
         bottom = ctk.CTkFrame(self, corner_radius=8, fg_color=PALETTE["panel_glass"], border_width=1, border_color=PALETTE["line"])
         bottom.grid(row=3, column=0, padx=18, pady=(0, 18), sticky="ew")
         bottom.grid_columnconfigure(0, weight=1)
-        self.status = ctk.CTkLabel(bottom, text="מוכן", text_color=PALETTE["muted"], anchor="e", justify="right")
+        self.status = ctk.CTkLabel(
+            bottom,
+            text=ui_text("מוכן"),
+            font=ui_font(13),
+            text_color=PALETTE["muted"],
+            anchor="e",
+            justify="right",
+        )
         self.status.grid(row=0, column=0, padx=14, pady=10, sticky="ew")
 
         self.after(200, self._draw_empty_dashboard)
@@ -207,20 +222,22 @@ class CapitalGainsApp(BaseWindow):
             label_text = "בחרי דוחות Excel לניתוח"
         ctk.CTkLabel(
             panel,
-            text=label_text,
-            font=ctk.CTkFont(size=18, weight="bold"),
+            text=ui_text(label_text),
+            font=ui_font(18, "bold"),
             text_color=PALETTE["text"],
             anchor="e",
         ).grid(row=0, column=0, padx=20, pady=(20, 4), sticky="ew")
         ctk.CTkLabel(
             panel,
-            text="הדוחות נשארים מקומית במחשב. קבצי מקור לא נדחפים ל-Git.",
+            text=ui_text("הדוחות נשארים מקומית במחשב. קבצי מקור לא נדחפים ל-Git."),
+            font=ui_font(13),
             text_color=PALETTE["muted"],
             anchor="e",
         ).grid(row=1, column=0, padx=20, pady=(0, 14), sticky="ew")
         ctk.CTkLabel(
             panel,
-            text="אפשר לנתח גם קובץ יחיד של נייר ערך אחד, והייצוא יישאר זמין.",
+            text=ui_text("אפשר לנתח גם קובץ יחיד של נייר ערך אחד, והייצוא יישאר זמין."),
+            font=ui_font(13),
             text_color=PALETTE["muted"],
             anchor="e",
         ).grid(row=2, column=0, padx=20, pady=(0, 8), sticky="ew")
@@ -240,7 +257,7 @@ class CapitalGainsApp(BaseWindow):
             borderwidth=0,
             selectbackground="#2A3138",
             selectforeground=PALETTE["chart_white"],
-            font=("Segoe UI", 10),
+            font=(ASSISTANT_FONT_FAMILY, 11),
         )
         self.file_list.grid(row=0, column=0, padx=14, pady=14, sticky="nsew")
 
@@ -252,7 +269,8 @@ class CapitalGainsApp(BaseWindow):
 
         self.exchange_status = ctk.CTkLabel(
             panel,
-            text="שער דולר: טרם נטען",
+            text=ui_text("שער דולר: טרם נטען"),
+            font=ui_font(13),
             text_color=PALETTE["muted"],
             anchor="e",
         )
@@ -266,8 +284,8 @@ class CapitalGainsApp(BaseWindow):
 
         ctk.CTkLabel(
             dashboard,
-            text="דשבורד",
-            font=ctk.CTkFont(size=20, weight="bold"),
+            text=ui_text("דשבורד"),
+            font=ui_font(20, "bold"),
             text_color=PALETTE["text"],
             anchor="e",
         ).grid(row=0, column=0, columnspan=2, padx=18, pady=(18, 8), sticky="ew")
@@ -281,13 +299,13 @@ class CapitalGainsApp(BaseWindow):
         for index, (key, title, color) in enumerate(cards):
             card = ctk.CTkFrame(dashboard, corner_radius=8, fg_color=color)
             card.grid(row=1 + index // 2, column=index % 2, padx=10, pady=8, sticky="ew")
-            ctk.CTkLabel(card, text=title, text_color=PALETTE["muted"], anchor="e").pack(
+            ctk.CTkLabel(card, text=ui_text(title), font=ui_font(13), text_color=PALETTE["muted"], anchor="e").pack(
                 fill="x", padx=12, pady=(10, 0)
             )
             value_label = ctk.CTkLabel(
                 card,
                 text="-",
-                font=ctk.CTkFont(size=23, weight="bold"),
+                font=ui_font(23, "bold"),
                 text_color=PALETTE["text"],
                 anchor="e",
             )
@@ -299,15 +317,16 @@ class CapitalGainsApp(BaseWindow):
         insights_frame.grid_columnconfigure(0, weight=1)
         ctk.CTkLabel(
             insights_frame,
-            text="5 תובנות מרכזיות",
-            font=ctk.CTkFont(size=15, weight="bold"),
+            text=ui_text("5 תובנות מרכזיות"),
+            font=ui_font(15, "bold"),
             text_color=PALETTE["text"],
             anchor="e",
         ).grid(row=0, column=0, padx=12, pady=(10, 4), sticky="ew")
         for index in range(5):
             label = ctk.CTkLabel(
                 insights_frame,
-                text=_rtl(f"{index + 1}. התובנות יופיעו אחרי החישוב"),
+                text=ui_text(f"{index + 1}. התובנות יופיעו אחרי החישוב"),
+                font=ui_font(13),
                 text_color=PALETTE["muted"],
                 anchor="e",
                 justify="right",
@@ -338,7 +357,8 @@ class CapitalGainsApp(BaseWindow):
         is_secondary = fg_color == PALETTE["secondary"]
         return ctk.CTkButton(
             parent,
-            text=text,
+            text=ui_text(text),
+            font=ui_font(14, "bold"),
             width=width,
             command=command,
             fg_color=fg_color or PALETTE["primary"],
@@ -351,7 +371,7 @@ class CapitalGainsApp(BaseWindow):
 
     def add_files(self) -> None:
         selected = filedialog.askopenfilenames(
-            title="בחרי דוחות Excel",
+            title=ui_title("בחרי דוחות Excel"),
             filetypes=[("Excel files", "*.xlsx *.xlsm *.xls"), ("All files", "*.*")],
         )
         self._add_paths(selected)
@@ -359,17 +379,17 @@ class CapitalGainsApp(BaseWindow):
     def clear_files(self) -> None:
         self.files.clear()
         self.file_list.delete(0, tk.END)
-        self.status.configure(text="הרשימה נוקתה")
+        self.status.configure(text=ui_text("הרשימה נוקתה"))
         self._draw_empty_dashboard()
 
     def fetch_exchange_rate(self) -> None:
         try:
             requested_date = parse_user_date(self.exchange_date_var.get())
         except ValueError as exc:
-            messagebox.showwarning("תאריך לא תקין", str(exc))
+            messagebox.showwarning(ui_title("תאריך לא תקין"), ui_text(str(exc)))
             return
-        self.exchange_status.configure(text="טוען שער יציג מבנק ישראל...")
-        self.status.configure(text="טוען שער דולר מבנק ישראל")
+        self.exchange_status.configure(text=ui_text("טוען שער יציג מבנק ישראל..."))
+        self.status.configure(text=ui_text("טוען שער דולר מבנק ישראל"))
         threading.Thread(target=self._exchange_worker, args=(requested_date,), daemon=True).start()
 
     def _exchange_worker(self, requested_date: date) -> None:
@@ -385,12 +405,12 @@ class CapitalGainsApp(BaseWindow):
         note = f"שער דולר ל-{rate.published_date:%Y-%m-%d}: {rate.rate:.4f}"
         if rate.published_date != rate.lookup_date:
             note += f" (תאריך יעד: {rate.lookup_date:%Y-%m-%d})"
-        self.exchange_status.configure(text=_rtl(note), text_color=PALETTE["primary_hover"])
-        self.status.configure(text="שער הדולר נטען מבנק ישראל")
+        self.exchange_status.configure(text=ui_text(note), text_color=PALETTE["primary_hover"])
+        self.status.configure(text=ui_text("שער הדולר נטען מבנק ישראל"))
 
     def _set_exchange_error(self, error: str) -> None:
-        self.exchange_status.configure(text=_rtl(f"לא ניתן לטעון שער דולר: {error}"), text_color=PALETTE["warning"])
-        self.status.configure(text="טעינת שער הדולר נכשלה")
+        self.exchange_status.configure(text=ui_text(f"לא ניתן לטעון שער דולר: {error}"), text_color=PALETTE["warning"])
+        self.status.configure(text=ui_text("טעינת שער הדולר נכשלה"))
 
     def _on_drop(self, event) -> None:
         paths = self.tk.splitlist(event.data)
@@ -401,15 +421,15 @@ class CapitalGainsApp(BaseWindow):
             path = Path(raw)
             if path.suffix.lower() in {".xlsx", ".xlsm", ".xls"} and path not in self.files:
                 self.files.append(path)
-                self.file_list.insert(tk.END, str(path))
-        self.status.configure(text=_rtl(f"{len(self.files)} קבצים ברשימה"))
+                self.file_list.insert(tk.END, ui_text(path.name))
+        self.status.configure(text=ui_text(f"{len(self.files)} קבצים ברשימה"))
 
     def calculate_and_export(self) -> None:
         if not self.files:
-            messagebox.showwarning("אין קבצים", "בחרי לפחות קובץ Excel אחד.")
+            messagebox.showwarning(ui_title("אין קבצים"), ui_text("בחרי לפחות קובץ Excel אחד."))
             return
         output = filedialog.asksaveasfilename(
-            title="שמרי דוח FIFO",
+            title=ui_title("שמרי דוח FIFO"),
             defaultextension=".xlsx",
             initialfile=f"fifo_report_{datetime.now():%Y%m%d_%H%M}.xlsx",
             filetypes=[("Excel workbook", "*.xlsx")],
@@ -420,8 +440,8 @@ class CapitalGainsApp(BaseWindow):
             requested_date = parse_user_date(self.exchange_date_var.get())
             transactions, issues = parse_workbooks(self.files)
         except Exception as exc:
-            messagebox.showerror("שגיאה בקריאת הקבצים", str(exc))
-            self.status.configure(text="שגיאה בקריאת הקבצים")
+            messagebox.showerror(ui_title("שגיאה בקריאת הקבצים"), ui_text(str(exc)))
+            self.status.configure(text=ui_text("שגיאה בקריאת הקבצים"))
             return
 
         serious = [issue for issue in issues if issue.severity == "error"]
@@ -429,7 +449,7 @@ class CapitalGainsApp(BaseWindow):
             dialog = CorrectionsDialog(self, transactions, serious)
             self.wait_window(dialog)
             if not dialog.confirmed:
-                self.status.configure(text="החישוב בוטל עד לתיקון הנתונים")
+                self.status.configure(text=ui_text("החישוב בוטל עד לתיקון הנתונים"))
                 return
             corrected_keys = set(dialog.corrections)
             _apply_corrections(transactions, dialog.corrections)
@@ -440,11 +460,11 @@ class CapitalGainsApp(BaseWindow):
             ]
             unresolved = [issue for issue in issues if issue.severity == "error"]
             if unresolved:
-                messagebox.showwarning("נותרו שגיאות", "לא כל שורות השגיאה תוקנו. החישוב נעצר.")
-                self.status.configure(text="נותרו שגיאות לתיקון")
+                messagebox.showwarning(ui_title("נותרו שגיאות"), ui_text("לא כל שורות השגיאה תוקנו. החישוב נעצר."))
+                self.status.configure(text=ui_text("נותרו שגיאות לתיקון"))
                 return
 
-        self.status.configure(text="מחשב FIFO, מושך שער דולר ומייצא דוח...")
+        self.status.configure(text=ui_text("מחשב FIFO, מושך שער דולר ומייצא דוח..."))
         threading.Thread(
             target=self._calculate_worker,
             args=(transactions, issues, output, requested_date),
@@ -473,8 +493,8 @@ class CapitalGainsApp(BaseWindow):
             self.after(0, lambda: self._done(path, result, exchange_error))
         except Exception as exc:  # pragma: no cover - GUI boundary
             error = str(exc)
-            self.after(0, lambda: messagebox.showerror("שגיאה", error))
-            self.after(0, lambda: self.status.configure(text="שגיאה בחישוב"))
+            self.after(0, lambda: messagebox.showerror(ui_title("שגיאה"), ui_text(error)))
+            self.after(0, lambda: self.status.configure(text=ui_text("שגיאה בחישוב")))
 
     def _done(self, path: Path, result: CalculationResult, exchange_error: str = "") -> None:
         self.last_result = result
@@ -482,13 +502,13 @@ class CapitalGainsApp(BaseWindow):
             self.last_exchange_rate = result.exchange_rate
             self._set_exchange_rate(result.exchange_rate)
         self._update_dashboard(result)
-        self.status.configure(text=f"הדוח נשמר: {path}")
+        self.status.configure(text=ui_text(f"הדוח נשמר: {path}"))
         extra = f"\nשער דולר: {result.exchange_rate.rate:.4f}" if result.exchange_rate else ""
         if exchange_error:
             extra += f"\nלא נטען שער דולר: {exchange_error}"
         messagebox.showinfo(
-            "הסתיים",
-            f"הדוח נוצר בהצלחה.\nשורות FIFO: {len(result.realized)}\nהתראות: {len(result.issues)}{extra}\n\n{path}",
+            ui_title("הסתיים"),
+            ui_text(f"הדוח נוצר בהצלחה.\nשורות FIFO: {len(result.realized)}\nהתראות: {len(result.issues)}{extra}\n\n{path}"),
         )
 
     def _update_dashboard(self, result: CalculationResult) -> None:
@@ -499,7 +519,7 @@ class CapitalGainsApp(BaseWindow):
         self.kpi_labels["issues"].configure(text=f"{summary.issue_count:,}")
         for index, label in enumerate(self.insight_labels):
             insight = summary.key_insights[index] if index < len(summary.key_insights) else ""
-            label.configure(text=_rtl(f"{index + 1}. {insight}") if insight else "")
+            label.configure(text=ui_text(f"{index + 1}. {insight}") if insight else "")
         self._draw_gain_chart(summary.top_securities)
         self._draw_action_chart(summary.action_counts)
 
@@ -507,7 +527,7 @@ class CapitalGainsApp(BaseWindow):
         for label in self.kpi_labels.values():
             label.configure(text="-")
         for index, label in enumerate(self.insight_labels):
-            label.configure(text=_rtl(f"{index + 1}. התובנות יופיעו אחרי החישוב"))
+            label.configure(text=ui_text(f"{index + 1}. התובנות יופיעו אחרי החישוב"))
         self._draw_gain_chart([])
         self._draw_action_chart([])
 
@@ -516,9 +536,22 @@ class CapitalGainsApp(BaseWindow):
         canvas.delete("all")
         width = max(canvas.winfo_width(), 420)
         height = max(canvas.winfo_height(), 190)
-        canvas.create_text(width - 8, 18, text="רווח/הפסד לפי נייר", anchor="e", fill=PALETTE["text"], font=("Segoe UI", 12, "bold"))
+        canvas.create_text(
+            width - 8,
+            18,
+            text=ui_text("רווח/הפסד לפי נייר"),
+            anchor="e",
+            fill=PALETTE["text"],
+            font=(ASSISTANT_FONT_FAMILY, 13, "bold"),
+        )
         if not rows:
-            canvas.create_text(width / 2, height / 2, text="אין עדיין נתוני חישוב", fill=PALETTE["muted"], font=("Segoe UI", 11))
+            canvas.create_text(
+                width / 2,
+                height / 2,
+                text=ui_text("אין עדיין נתוני חישוב"),
+                fill=PALETTE["muted"],
+                font=(ASSISTANT_FONT_FAMILY, 12),
+            )
             return
 
         rows = rows[:6]
@@ -543,13 +576,13 @@ class CapitalGainsApp(BaseWindow):
             elif index % 4 == 3:
                 color = PALETTE["chart_yellow"]
             canvas.create_rectangle(center - bar_width / 2, y0, center + bar_width / 2, y1, fill=color, outline="")
-            canvas.create_text(center, y1 + 12 if value >= 0 else y1 + 12, text=currency, fill=PALETTE["chart_white"], font=("Segoe UI", 8))
+            canvas.create_text(center, y1 + 12 if value >= 0 else y1 + 12, text=currency, fill=PALETTE["chart_white"], font=(ASSISTANT_FONT_FAMILY, 8))
             canvas.create_text(
                 center,
                 168,
-                text=_short_label(label),
+                text=ui_text(_short_label(label)),
                 fill=PALETTE["muted"],
-                font=("Segoe UI", 8),
+                font=(ASSISTANT_FONT_FAMILY, 8),
                 width=58,
                 justify="center",
             )
@@ -559,9 +592,22 @@ class CapitalGainsApp(BaseWindow):
         canvas.delete("all")
         width = max(canvas.winfo_width(), 420)
         height = max(canvas.winfo_height(), 190)
-        canvas.create_text(width - 8, 18, text="פילוח פעולות", anchor="e", fill=PALETTE["text"], font=("Segoe UI", 12, "bold"))
+        canvas.create_text(
+            width - 8,
+            18,
+            text=ui_text("פילוח פעולות"),
+            anchor="e",
+            fill=PALETTE["text"],
+            font=(ASSISTANT_FONT_FAMILY, 13, "bold"),
+        )
         if not rows:
-            canvas.create_text(width / 2, height / 2, text="הפילוח יופיע אחרי חישוב", fill=PALETTE["muted"], font=("Segoe UI", 11))
+            canvas.create_text(
+                width / 2,
+                height / 2,
+                text=ui_text("הפילוח יופיע אחרי חישוב"),
+                fill=PALETTE["muted"],
+                font=(ASSISTANT_FONT_FAMILY, 12),
+            )
             return
 
         colors = CHART_COLORS
@@ -593,17 +639,17 @@ class CapitalGainsApp(BaseWindow):
             canvas.create_text(
                 legend_x - 16,
                 y,
-                text=f"{label}: {value:,} ({percent:.0f}%)",
+                text=ui_text(f"{label}: {value:,} ({percent:.0f}%)"),
                 anchor="e",
                 fill=PALETTE["muted"],
-                font=("Segoe UI", 9),
+                font=(ASSISTANT_FONT_FAMILY, 9),
             )
 
 
 class IssuesDialog(ctk.CTkToplevel):
     def __init__(self, parent, issues: list[ValidationIssue]) -> None:
         super().__init__(parent)
-        self.title("שגיאות בדוחות")
+        self.title(ui_title("שגיאות בדוחות"))
         self.geometry("860x420")
         self.transient(parent)
         self.grab_set()
@@ -611,8 +657,8 @@ class IssuesDialog(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             self,
-            text="נמצאו שורות שדורשות תיקון ידני בקובץ המקור",
-            font=ctk.CTkFont(size=18, weight="bold"),
+            text=ui_text("נמצאו שורות שדורשות תיקון ידני בקובץ המקור"),
+            font=ui_font(18, "bold"),
             text_color=PALETTE["text"],
         ).pack(anchor="e", padx=18, pady=(18, 8))
 
@@ -628,17 +674,32 @@ class IssuesDialog(ctk.CTkToplevel):
         )
         titles = ["חומרה", "קובץ", "גיליון", "שורה", "שדה", "הודעה"]
         for col, title in zip(columns, titles, strict=True):
-            tree.heading(col, text=title, anchor="e")
+            tree.heading(col, text=ui_text(title), anchor="e")
             tree.column(col, width=120 if col != "message" else 340, anchor="e")
         for issue in issues:
             tree.insert(
                 "",
                 tk.END,
-                values=(issue.severity, issue.source_file, issue.sheet, issue.row_number, issue.field, issue.message),
+                values=(
+                    issue.severity,
+                    ui_text(issue.source_file),
+                    ui_text(issue.sheet),
+                    issue.row_number,
+                    ui_text(issue.field),
+                    ui_text(issue.message),
+                ),
             )
         tree.pack(fill="both", expand=True, padx=18, pady=8)
 
-        ctk.CTkButton(self, text="סגור", command=self.destroy, fg_color=PALETTE["primary"], hover_color=PALETTE["primary_hover"]).pack(
+        ctk.CTkButton(
+            self,
+            text=ui_text("סגור"),
+            font=ui_font(14, "bold"),
+            command=self.destroy,
+            fg_color=PALETTE["primary"],
+            hover_color=PALETTE["primary_hover"],
+            text_color=PALETTE["button_text"],
+        ).pack(
             anchor="e", padx=18, pady=(8, 18)
         )
 
@@ -646,7 +707,7 @@ class IssuesDialog(ctk.CTkToplevel):
 class CorrectionsDialog(ctk.CTkToplevel):
     def __init__(self, parent, transactions: list[Transaction], issues: list[ValidationIssue]) -> None:
         super().__init__(parent)
-        self.title("תיקון ידני")
+        self.title(ui_title("תיקון ידני"))
         self.geometry("920x520")
         self.transient(parent)
         self.grab_set()
@@ -659,8 +720,8 @@ class CorrectionsDialog(ctk.CTkToplevel):
 
         ctk.CTkLabel(
             self,
-            text="נמצאו שורות עם נתון חסר. בחרי שורה, הזיני ערך מתוקן ושמרי.",
-            font=ctk.CTkFont(size=17, weight="bold"),
+            text=ui_text("נמצאו שורות עם נתון חסר. בחרי שורה, הזיני ערך מתוקן ושמרי."),
+            font=ui_font(17, "bold"),
             text_color=PALETTE["text"],
         ).pack(anchor="e", padx=18, pady=(18, 8))
 
@@ -685,14 +746,22 @@ class CorrectionsDialog(ctk.CTkToplevel):
             "message": "הודעה",
         }
         for col in columns:
-            self.tree.heading(col, text=titles[col], anchor="e")
+            self.tree.heading(col, text=ui_text(titles[col]), anchor="e")
             self.tree.column(col, width=widths[col], anchor="e")
         for index, issue in enumerate(issues):
             self.tree.insert(
                 "",
                 tk.END,
                 iid=str(index),
-                values=("פתוח", issue.source_file, issue.sheet, issue.row_number, issue.field, issue.value, issue.message),
+                values=(
+                    ui_text("פתוח"),
+                    ui_text(issue.source_file),
+                    ui_text(issue.sheet),
+                    issue.row_number,
+                    ui_text(issue.field),
+                    issue.value,
+                    ui_text(issue.message),
+                ),
             )
         self.tree.bind("<<TreeviewSelect>>", self._on_select)
         self.tree.pack(fill="both", expand=True, padx=18, pady=8)
@@ -700,28 +769,51 @@ class CorrectionsDialog(ctk.CTkToplevel):
         form = ctk.CTkFrame(self, fg_color=PALETTE["panel"])
         form.pack(fill="x", padx=18, pady=(4, 8))
         form.grid_columnconfigure(1, weight=1)
-        self.selected_label = ctk.CTkLabel(form, text="לא נבחרה שורה", text_color=PALETTE["muted"], anchor="e")
+        self.selected_label = ctk.CTkLabel(
+            form,
+            text=ui_text("לא נבחרה שורה"),
+            font=ui_font(13),
+            text_color=PALETTE["muted"],
+            anchor="e",
+        )
         self.selected_label.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        self.value_entry = ctk.CTkEntry(form, placeholder_text="ערך חדש", border_color=PALETTE["line"], justify="right")
+        self.value_entry = ctk.CTkEntry(
+            form,
+            placeholder_text=ui_text("ערך חדש"),
+            border_color=PALETTE["line"],
+            justify="right",
+            font=ui_font(13),
+        )
         self.value_entry.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
         ctk.CTkButton(
             form,
-            text="שמור תיקון",
+            text=ui_text("שמור תיקון"),
+            font=ui_font(14, "bold"),
             command=self._save_current,
             fg_color=PALETTE["primary"],
             hover_color=PALETTE["primary_hover"],
+            text_color=PALETTE["button_text"],
         ).grid(row=0, column=2, padx=10, pady=10)
 
         buttons = ctk.CTkFrame(self, fg_color=PALETTE["panel"])
         buttons.pack(fill="x", padx=18, pady=(0, 18))
         ctk.CTkButton(
             buttons,
-            text="המשך עם התיקונים",
+            text=ui_text("המשך עם התיקונים"),
+            font=ui_font(14, "bold"),
             command=self._confirm,
             fg_color=PALETTE["primary"],
             hover_color=PALETTE["primary_hover"],
+            text_color=PALETTE["button_text"],
         ).pack(side="right", padx=8, pady=8)
-        ctk.CTkButton(buttons, text="ביטול", fg_color="#7D8D92", command=self.destroy).pack(side="right", padx=8, pady=8)
+        ctk.CTkButton(
+            buttons,
+            text=ui_text("ביטול"),
+            font=ui_font(14, "bold"),
+            fg_color=PALETTE["secondary"],
+            hover_color=PALETTE["secondary_hover"],
+            command=self.destroy,
+        ).pack(side="right", padx=8, pady=8)
 
     def _on_select(self, _event=None) -> None:
         selection = self.tree.selection()
@@ -729,17 +821,17 @@ class CorrectionsDialog(ctk.CTkToplevel):
             return
         issue = self.issues[int(selection[0])]
         self.selected_issue = issue
-        self.selected_label.configure(text=f"{issue.source_file} | שורה {issue.row_number} | {issue.field}")
+        self.selected_label.configure(text=ui_text(f"{issue.source_file} | שורה {issue.row_number} | {issue.field}"))
         self.value_entry.delete(0, tk.END)
         self.value_entry.insert(0, "" if issue.value is None else str(issue.value))
 
     def _save_current(self) -> None:
         if self.selected_issue is None:
-            messagebox.showwarning("לא נבחרה שורה", "בחרי שורה לתיקון.")
+            messagebox.showwarning(ui_title("לא נבחרה שורה"), ui_text("בחרי שורה לתיקון."))
             return
         value = self.value_entry.get().strip()
         if not value:
-            messagebox.showwarning("ערך חסר", "הזיני ערך חדש.")
+            messagebox.showwarning(ui_title("ערך חסר"), ui_text("הזיני ערך חדש."))
             return
         issue = self.selected_issue
         key = (issue.source_file, issue.sheet, issue.row_number, issue.field)
@@ -747,13 +839,13 @@ class CorrectionsDialog(ctk.CTkToplevel):
         selection = self.tree.selection()
         if selection:
             values = list(self.tree.item(selection[0], "values"))
-            values[0] = "תוקן"
+            values[0] = ui_text("תוקן")
             values[5] = value
             self.tree.item(selection[0], values=values)
 
     def _confirm(self) -> None:
         missing = len(self.issues) - len(self.corrections)
-        if missing and not messagebox.askyesno("לא כל השורות תוקנו", f"נותרו {missing} שורות ללא תיקון. להמשיך?"):
+        if missing and not messagebox.askyesno(ui_title("לא כל השורות תוקנו"), ui_text(f"נותרו {missing} שורות ללא תיקון. להמשיך?")):
             return
         self.confirmed = True
         self.destroy()
@@ -791,6 +883,7 @@ def _configure_treeview_style(widget) -> None:
         background="#0D1013",
         fieldbackground="#0D1013",
         foreground=PALETTE["text"],
+        font=(ASSISTANT_FONT_FAMILY, 11),
         bordercolor=PALETTE["line"],
         lightcolor=PALETTE["line"],
         darkcolor=PALETTE["line"],
@@ -800,6 +893,7 @@ def _configure_treeview_style(widget) -> None:
         "Luxury.Treeview.Heading",
         background="#1D2228",
         foreground=PALETTE["chart_white"],
+        font=(ASSISTANT_FONT_FAMILY, 11, "bold"),
         bordercolor=PALETTE["line"],
         relief="flat",
         anchor="e",
@@ -812,10 +906,6 @@ def _short_label(value: str) -> str:
     if len(value) <= 9:
         return value
     return value[:8] + "..."
-
-
-def _rtl(value: str) -> str:
-    return f"{RTL_MARK}{value}"
 
 
 def main() -> None:
